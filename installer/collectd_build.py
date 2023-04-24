@@ -19,8 +19,7 @@ from installer import common
 COLLECTD_STRING = "collectd"
 COLLECT_GIT_STRING = COLLECTD_STRING + ".git"
 RPM_STRING = "RPMS"
-COLLECTD_RPM_NAMES = ["collectd", "collectd-disk", "collectd-filedata",
-                      "collectd-ime", "collectd-sensors", "libcollectdclient"]
+COLLECTD_RPM_NAMES = ["collectd", "collectd-filedata"]
 
 
 def collectd_build(workspace, build_host, base_path,
@@ -135,7 +134,7 @@ def collectd_build(workspace, build_host, base_path,
                '--without amqp --without gmond --without nut --without pinba '
                '--without ping --without varnish --without dpdkstat '
                '--without turbostat --without redis --without write_redis '
-               '--without gps --without lvm --define "_topdir %s" '
+               '--without gps --without lvm --without ssh --define "_topdir %s" '
                '--define="rev $(git rev-parse --short HEAD)" '
                '--define="dist .el%s" '
                'contrib/redhat/collectd.spec' %
@@ -414,8 +413,8 @@ def collecd_build_prepare(current_dir, relative_workspace):
 
     collectd_git_path = current_dir + "/../" + "collectd.git"
 
-    # collectd_git_url = "https://github.com/ayush-ddn/collectd.git"
-    collectd_git_url = "https://github.com/DDNStorage/collectd.git"
+    collectd_git_url = "https://github.com/ayush-ddn/collectd.git"
+    # collectd_git_url = "https://github.com/DDNStorage/collectd.git"
     logging.info("using git url [%s]", collectd_git_url)
 
     # collectd_git_branch = "MOM-23178"
