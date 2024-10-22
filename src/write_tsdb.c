@@ -396,12 +396,19 @@ static int wt_format_values(char *ret, size_t ret_len, int ds_num,
 }
 
 static int wt_format_name(char *ret, int ret_len, const value_list_t *vl,
-                          const struct wt_callback *cb, const char *ds_name) {
+                          const struct wt_callback *cb, const char *ds_name, int type) {
   int status;
   char *temp = NULL;
   const char *prefix = "";
   const char *meta_name = "tsdb_name";
   const char *meta_prefix = "tsdb_prefix";
+  char suffix[7] = "";
+
+  /* Prometheus best practices:
+   * cumulative metrics (COUNTER or DERIVE) should have a "total" suffix. */
+  if (type == DS_TYPE_COUNTER || type == DS_TYPE_DERIVE) {
+    sstrncpy(suffix, "_total", sizeof(suffix));
+  }
 
   if (vl->meta) {
     status = meta_data_get_string(vl->meta, meta_name, &temp);
@@ -411,7 +418,7 @@ static int wt_format_name(char *ret, int ret_len, const value_list_t *vl,
       sfree(temp);
       return status;
     } else {
-      snprintf(ret, ret_len, "%s", temp);
+      snprintf(ret, ret_len, "%s%s", temp, suffix);
       sfree(temp);
       return 0;
     }
@@ -430,19 +437,19 @@ static int wt_format_name(char *ret, int ret_len, const value_list_t *vl,
   if (ds_name != NULL) {
     if (vl->plugin_instance[0] == '\0') {
       if (vl->type_instance[0] == '\0') {
-        snprintf(ret, ret_len, "%s%s.%s.%s", prefix, vl->plugin, vl->type,
-                 ds_name);
+        snprintf(ret, ret_len, "%s%s.%s.%s%s", prefix, vl->plugin, vl->type,
+                 ds_name, suffix);
       } else {
-        snprintf(ret, ret_len, "%s%s.%s.%s.%s", prefix, vl->plugin, vl->type,
-                 vl->type_instance, ds_name);
+        snprintf(ret, ret_len, "%s%s.%s.%s.%s%s", prefix, vl->plugin, vl->type,
+                 vl->type_instance, ds_name, suffix);
       }
     } else { /* vl->plugin_instance != "" */
       if (vl->type_instance[0] == '\0') {
-        snprintf(ret, ret_len, "%s%s.%s.%s.%s", prefix, vl->plugin,
-                 vl->plugin_instance, vl->type, ds_name);
+        snprintf(ret, ret_len, "%s%s.%s.%s.%s%s", prefix, vl->plugin,
+                 vl->plugin_instance, vl->type, ds_name, suffix);
       } else {
-        snprintf(ret, ret_len, "%s%s.%s.%s.%s.%s", prefix, vl->plugin,
-                 vl->plugin_instance, vl->type, vl->type_instance, ds_name);
+        snprintf(ret, ret_len, "%s%s.%s.%s.%s.%s%s", prefix, vl->plugin,
+                 vl->plugin_instance, vl->type, vl->type_instance, ds_name, suffix);
       }
     }
   } else { /* ds_name == NULL */
@@ -571,7 +578,7 @@ static int wt_write_messages(const data_set_t *ds, const value_list_t *vl,
       ds_name = ds->ds[i].name;
 
     /* Copy the identifier to 'key' and escape it. */
-    status = wt_format_name(key, sizeof(key), vl, cb, ds_name);
+    status = wt_format_name(key, sizeof(key), vl, cb, ds_name, ds->ds[i].type);
     if (status != 0) {
       ERROR("write_tsdb plugin: error with format_name");
       return status;
