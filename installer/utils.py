@@ -264,7 +264,7 @@ class CommandJob:
                         loop = False
                     else:
                         continue
-            data = "".join(tmp_data)
+            data = "".join(b.decode('utf-8') for b in tmp_data)
         else:
             # perform a single read
             data = os.read(pipe.fileno(), 1024).decode()

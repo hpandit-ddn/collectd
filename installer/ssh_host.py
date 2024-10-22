@@ -15,7 +15,7 @@ import shutil
 import re
 
 # local libs
-from installer import utils
+import utils
 
 # OS distribution RHEL6/CentOS6
 DISTRO_RHEL6 = "rhel6"

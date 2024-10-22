@@ -8,7 +8,7 @@ Common library for ESMON
 import logging
 
 # Local libs
-from installer import utils
+import utils
 
 RPM_PATTERN_RHEL6 = r"^%s-\d.+(\.el6|).*\.rpm$"
 RPM_PATTERN_RHEL7 = r"^%s-\d.+(\.el7|).*\.rpm$"

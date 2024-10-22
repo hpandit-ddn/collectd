@@ -11,10 +11,10 @@ import os
 import re
 
 # Local libs
-from installer import utils
-from installer import time_util
-from installer import ssh_host
-from installer import common
+import utils
+import time_util
+import ssh_host
+import common
 
 COLLECTD_STRING = "collectd"
 COLLECT_GIT_STRING = COLLECTD_STRING + ".git"
@@ -168,7 +168,7 @@ def collectd_build_check(workspace, build_host, base_path, collectd_git_path,
     """
     # pylint: disable=too-many-arguments,too-many-return-statements
     # pylint: disable=too-many-statements,too-many-branches,too-many-locals
-    local_rpm_dir = ("%s/%s" %
+    local_rpm_dir = ("%s/%s/x86_64" %
                      (base_path, RPM_STRING))
     command = ("mkdir -p %s && ls %s" %
                (local_rpm_dir, local_rpm_dir))
@@ -526,3 +526,5 @@ def main():
         sys.exit(ret)
     logging.info("Collectd is successfully built")
     sys.exit(0)
+
+main()
